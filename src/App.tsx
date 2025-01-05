@@ -9,9 +9,11 @@ import { useAuth } from './hooks/useAuth';
 import { useJokes } from './hooks/useJokes';
 import { usePremiumStatus } from './hooks/usePremiumStatus';
 import { AdminPanel } from './pages/AdminPanel';
+import { SettingsPage } from './pages/SettingsPage';
 import { AdminRoute } from './components/AdminRoute';
-import { JokeCard } from './components/JokeCard';
+import { JokeCard } from './components/jokes/JokeCard';
 import { Shield } from 'lucide-react';
+import { Container } from './components/ui/Container';
 
 function HomePage() {
   const session = useAuth();
@@ -21,18 +23,18 @@ function HomePage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen py-12">
+        <Container>
           <Header isAuthenticated={false} />
           <Auth />
-        </div>
+        </Container>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen py-12">
+      <Container>
         <Header isAuthenticated={true} isPremium={isPremium} />
         {session?.user?.email === 'admin3180@gmail.com' && (
           <Link
@@ -64,7 +66,7 @@ function HomePage() {
             />
           ))
         )}
-      </div>
+      </Container>
     </div>
   );
 }
@@ -74,14 +76,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminPanel />
-            </AdminRoute>
-          }
-        />
+        <Route path="/admin/*" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+        <Route path="/settings/*" element={<SettingsPage />} />
       </Routes>
       <Toaster position="top-right" />
     </Router>

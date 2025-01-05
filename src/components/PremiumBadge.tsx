@@ -1,3 +1,4 @@
+import React from 'react';
 import { Crown } from 'lucide-react';
 
 export function PremiumBadge() {

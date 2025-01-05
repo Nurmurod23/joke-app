@@ -26,14 +26,17 @@ export function useJokes(selectedCategory: string, session: any) {
       const { data: jokesData, error: jokesError } = await query;
       if (jokesError) throw jokesError;
 
+      // Get user's votes
       const { data: userVotes, error: userVotesError } = await supabase
         .from('votes')
         .select('joke_id')
         .eq('user_id', session.user.id);
       if (userVotesError) throw userVotesError;
 
+      // Create a set of jokes the user has voted on
       const userVotedJokes = new Set(userVotes.map(v => v.joke_id));
 
+      // Combine all the data
       setJokes(
         jokesData.map((joke) => ({
           ...joke,

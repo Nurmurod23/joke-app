@@ -1,3 +1,4 @@
+import React from 'react';
 import { Crown, Star, Zap, Sparkles } from 'lucide-react';
 
 interface PremiumFeaturesProps {

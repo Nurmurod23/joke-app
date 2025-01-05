@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ThumbsUp } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import toast from 'react-hot-toast';
-import { PremiumBadge } from './PremiumBadge';
+import { ThumbsUp, MessageCircle } from 'lucide-react';
+import { Card } from '../ui/Card';
 import { JokeActions } from './JokeActions';
 import { JokeEditForm } from './JokeEditForm';
+import { PremiumBadge } from '../PremiumBadge';
+import toast from 'react-hot-toast';
+import { supabase } from '../../lib/supabase';
 
 interface JokeCardProps {
   joke: {
@@ -36,10 +37,7 @@ export function JokeCard({ joke, onVote, userId, userIsPremium }: JokeCardProps)
     try {
       const { error } = await supabase
         .from('votes')
-        .insert([{ 
-          joke_id: joke.id,
-          user_id: userId
-        }]);
+        .insert([{ joke_id: joke.id, user_id: userId }]);
 
       if (error) throw error;
       onVote();
@@ -64,22 +62,24 @@ export function JokeCard({ joke, onVote, userId, userIsPremium }: JokeCardProps)
   }
 
   return (
-    <div className="card p-6 mb-6 group hover:scale-[1.02]">
-      <p className="text-xl text-gray-800 mb-4 leading-relaxed">{joke.content}</p>
+    <Card className="p-6 mb-6 group card-hover">
+      <p className="text-xl text-gray-800 mb-4 leading-relaxed font-medium">
+        {joke.content}
+      </p>
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-3">
-          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
+          <span className="px-4 py-1.5 rounded-full bg-blue-100 text-blue-800 font-medium">
             {joke.category}
           </span>
           {joke.author.is_premium && <PremiumBadge />}
         </div>
         <div className="flex items-center gap-6">
           <span className="text-gray-600">by {joke.author.email}</span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleVote}
               disabled={!userIsPremium && joke.user_has_voted}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
                 joke.user_has_voted 
                   ? userIsPremium 
                     ? 'bg-blue-100 text-blue-800'
@@ -101,6 +101,6 @@ export function JokeCard({ joke, onVote, userId, userIsPremium }: JokeCardProps)
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

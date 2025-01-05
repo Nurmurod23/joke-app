@@ -1,6 +1,7 @@
-import  { useState } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { usePremiumStatus } from '../hooks/usePremiumStatus';
 
 const categories = [
   'Dad Jokes',
@@ -18,9 +19,15 @@ interface JokeFormProps {
 export function JokeForm({ onJokeAdded, session }: JokeFormProps) {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState(categories[0]);
+  const { isPremium } = usePremiumStatus(session?.user?.id);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isPremium) {
+      toast.error('Only premium users can create jokes');
+      return;
+    }
 
     const { error } = await supabase
       .from('jokes')
@@ -39,6 +46,10 @@ export function JokeForm({ onJokeAdded, session }: JokeFormProps) {
       onJokeAdded();
     }
   };
+
+  if (!isPremium) {
+    return null;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-6">

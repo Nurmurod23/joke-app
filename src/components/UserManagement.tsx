@@ -1,3 +1,4 @@
+import React from 'react';
 import { Crown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
