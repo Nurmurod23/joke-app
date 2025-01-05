@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ThumbsUp, MessageCircle } from 'lucide-react';
 import { Card } from '../ui/Card';
-import { JokeActions } from '../JokeActions';
-import { JokeEditForm } from '../JokeEditForm';
+import { JokeActions } from './JokeActions';
+import { JokeEditForm } from './JokeEditForm';
 import { PremiumBadge } from '../PremiumBadge';
 import toast from 'react-hot-toast';
 import { supabase } from '../../lib/supabase';
