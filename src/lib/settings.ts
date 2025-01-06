@@ -1,14 +1,29 @@
 import { supabase } from './supabase';
-import { UserSettings } from './types/settings';
+import type { UserSettings } from './types/settings';
 
 export async function updateUserSettings(userId: string, settings: Partial<UserSettings>) {
-  return supabase
+  const { data: currentData, error: fetchError } = await supabase
     .from('profiles')
-    .update({ settings })
+    .select('settings')
+    .eq('id', userId)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  const updatedSettings = {
+    ...currentData?.settings,
+    ...settings
+  };
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ settings: updatedSettings })
     .eq('id', userId);
+
+  if (error) throw error;
 }
 
-export async function getUserSettings(userId: string) {
+export async function getUserSettings(userId: string): Promise<UserSettings | undefined> {
   const { data, error } = await supabase
     .from('profiles')
     .select('settings')
@@ -16,5 +31,5 @@ export async function getUserSettings(userId: string) {
     .single();
 
   if (error) throw error;
-  return data?.settings as UserSettings | undefined;
+  return data?.settings;
 }

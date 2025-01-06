@@ -1,28 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { getUserSettings, updateUserSettings } from '../../lib/settings';
+import { updateUserSettings } from '../../lib/settings';
+import { useUserSettings } from '../../hooks/useUserSettings';
+import { SettingsHeader } from '../ui/SettingsHeader';
 import toast from 'react-hot-toast';
 
 export function ProfileSettings() {
   const session = useAuth();
-  const [displayName, setDisplayName] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadSettings() {
-      if (!session?.user?.id) return;
-      try {
-        const settings = await getUserSettings(session.user.id);
-        setDisplayName(settings?.displayName || '');
-      } catch (error) {
-        console.error('Error loading settings:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadSettings();
-  }, [session?.user?.id]);
+  const { settings, loading } = useUserSettings(session?.user?.id);
+  const [displayName, setDisplayName] = useState(settings?.displayName || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,15 +30,11 @@ export function ProfileSettings() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-          <User className="w-8 h-8 text-blue-600" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold">Profile Settings</h2>
-          <p className="text-gray-600">Manage your profile information</p>
-        </div>
-      </div>
+      <SettingsHeader
+        icon={User}
+        title="Profile Settings"
+        description="Manage your profile information"
+      />
 
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
