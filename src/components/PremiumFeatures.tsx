@@ -1,16 +1,26 @@
 import React from 'react';
 import { Crown, Star, Zap, Sparkles } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { usePremiumStatus } from '../hooks/usePremiumStatus';
 
 interface PremiumFeaturesProps {
   isPremium: boolean;
 }
 
 export function PremiumFeatures({ isPremium }: PremiumFeaturesProps) {
+  const session = useAuth();
+  const { isPremium: userIsPremium } = usePremiumStatus(session?.user?.id);
+
+  // Only show premium features to non-premium users or premium users
+  if (!session || (userIsPremium && !isPremium)) {
+    return null;
+  }
+
   const features = [
     {
       icon: <Crown className="w-6 h-6" />,
-      title: 'Custom Themes',
-      description: 'Personalize your JokeBox experience with custom themes',
+      title: 'Create & Manage Jokes',
+      description: 'Create your own jokes and manage them',
     },
     {
       icon: <Star className="w-6 h-6" />,

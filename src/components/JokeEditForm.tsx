@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { Card } from './ui/Card';
 
 interface JokeEditFormProps {
   joke: {
     id: string;
     content: string;
     category: string;
+    author_id: string;
   };
+  currentUserId: string;
   onCancel: () => void;
   onSave: () => void;
 }
 
-export function JokeEditForm({ joke, onCancel, onSave }: JokeEditFormProps) {
+export function JokeEditForm({ joke, currentUserId, onCancel, onSave }: JokeEditFormProps) {
   const [content, setContent] = useState(joke.content);
   const [category, setCategory] = useState(joke.category);
 
@@ -32,7 +35,8 @@ export function JokeEditForm({ joke, onCancel, onSave }: JokeEditFormProps) {
       const { error } = await supabase
         .from('jokes')
         .update({ content, category })
-        .eq('id', joke.id);
+        .eq('id', joke.id)
+        .eq('author_id', currentUserId); // Extra safety check
 
       if (error) throw error;
       
@@ -45,46 +49,56 @@ export function JokeEditForm({ joke, onCancel, onSave }: JokeEditFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card p-6 mb-6">
-      <div className="mb-4">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows={3}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800"
-        >
-          <X className="w-4 h-4 mr-1" />
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          <Check className="w-4 h-4 mr-1" />
-          Save
-        </button>
-      </div>
-    </form>
+    <Card className="p-6 mb-6">
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+            Edit Your Joke
+          </label>
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="input-field"
+            rows={3}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            Category
+          </label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="select-field"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="button-secondary"
+          >
+            <X className="w-4 h-4 mr-1" />
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="button-primary"
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </Card>
   );
 }

@@ -20,6 +20,7 @@ export function JokeActions({
   onEdit,
   onDelete 
 }: JokeActionsProps) {
+  // Only show actions if user is premium and owns the joke
   if (!isPremium || authorId !== currentUserId) {
     return null;
   }
@@ -33,7 +34,8 @@ export function JokeActions({
       const { error } = await supabase
         .from('jokes')
         .delete()
-        .eq('id', jokeId);
+        .eq('id', jokeId)
+        .eq('author_id', currentUserId); // Extra safety check
 
       if (error) throw error;
       

@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { JokeForm } from '../components/JokeForm';
 import { AdminJokeCard } from '../components/AdminJokeCard';
 import { UserManagement } from '../components/UserManagement';
+import { CategoryManagement } from '../components/admin/CategoryManagement';
 import { useAuth } from '../hooks/useAuth';
 import { useAdminJokes } from '../hooks/useAdminJokes';
 import { useUsers } from '../hooks/useUsers';
-import { Shield, Users, BookOpen } from 'lucide-react';
+import { useCategories } from '../hooks/useCategories';
+import { Shield, Users, BookOpen, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-type Tab = 'jokes' | 'users';
+type Tab = 'jokes' | 'users' | 'categories';
 
 export function AdminPanel() {
   const session = useAuth();
   const { jokes, loading: jokesLoading, refetchJokes } = useAdminJokes();
   const { users, loading: usersLoading, refetchUsers } = useUsers();
+  const { categories, loading: categoriesLoading, refetchCategories } = useCategories();
   const [activeTab, setActiveTab] = useState<Tab>('jokes');
 
   return (
@@ -52,9 +55,20 @@ export function AdminPanel() {
             <Users className="w-4 h-4 mr-2" />
             Manage Users
           </button>
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`flex items-center px-4 py-2 rounded-md ${
+              activeTab === 'categories'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Tag className="w-4 h-4 mr-2" />
+            Manage Categories
+          </button>
         </div>
 
-        {activeTab === 'jokes' ? (
+        {activeTab === 'jokes' && (
           <>
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
               <h2 className="text-xl font-semibold mb-4">Add New Joke</h2>
@@ -80,7 +94,9 @@ export function AdminPanel() {
               )}
             </div>
           </>
-        ) : (
+        )}
+
+        {activeTab === 'users' && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Manage Users</h2>
             {usersLoading ? (
@@ -91,6 +107,20 @@ export function AdminPanel() {
               </div>
             ) : (
               <UserManagement users={users} onUserUpdated={refetchUsers} />
+            )}
+          </div>
+        )}
+
+        {activeTab === 'categories' && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Manage Categories</h2>
+            {categoriesLoading ? (
+              <div className="text-center py-12">Loading categories...</div>
+            ) : (
+              <CategoryManagement 
+                categories={categories} 
+                onCategoryUpdated={refetchCategories} 
+              />
             )}
           </div>
         )}

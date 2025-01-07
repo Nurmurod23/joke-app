@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -30,6 +30,23 @@ export function UserManagement({ users, onUserUpdated }: UserManagementProps) {
     } catch (error) {
       toast.error('Failed to update user status');
       console.error('Error updating user:', error);
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      if (error) throw error;
+      
+      toast.success('User deleted successfully');
+      onUserUpdated();
+    } catch (error) {
+      toast.error('Failed to delete user');
+      console.error('Error deleting user:', error);
     }
   };
 
@@ -71,17 +88,26 @@ export function UserManagement({ users, onUserUpdated }: UserManagementProps) {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <button
-                  onClick={() => togglePremium(user.id, user.is_premium)}
-                  className={`flex items-center px-3 py-1 rounded-md ${
-                    user.is_premium
-                      ? 'text-gray-600 hover:text-gray-800'
-                      : 'text-blue-600 hover:text-blue-800'
-                  }`}
-                >
-                  <Crown className="w-4 h-4 mr-1" />
-                  {user.is_premium ? 'Remove Premium' : 'Make Premium'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => togglePremium(user.id, user.is_premium)}
+                    className={`flex items-center px-3 py-1 rounded-md ${
+                      user.is_premium
+                        ? 'text-gray-600 hover:text-gray-800'
+                        : 'text-blue-600 hover:text-blue-800'
+                    }`}
+                  >
+                    <Crown className="w-4 h-4 mr-1" />
+                    {user.is_premium ? 'Remove Premium' : 'Make Premium'}
+                  </button>
+                  <button
+                    onClick={() => deleteUser(user.id)}
+                    className="flex items-center px-3 py-1 text-red-600 hover:text-red-800 rounded-md"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
